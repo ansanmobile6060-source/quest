@@ -37,6 +37,12 @@ button{font-family:inherit}
 @keyframes boing{0%{transform:scale(1,1)}30%{transform:scale(1.07,.9)}55%{transform:scale(.95,1.07)}80%{transform:scale(1.02,.98)}100%{transform:scale(1,1)}}
 .boing{transform-box:fill-box;transform-origin:50% 100%;animation:boing .45s ease-out}
 @keyframes pop{from{transform:scale(.7) translateY(30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes hammer{0%,100%{transform:rotate(-48deg)}45%{transform:rotate(12deg)}60%{transform:rotate(6deg)}}
+.hammer{transform-box:fill-box;transform-origin:92% 60%;animation:hammer .7s ease-in-out infinite}
+@keyframes spark2{0%,100%{opacity:0;transform:translateY(0)}20%{opacity:1}60%{opacity:.6;transform:translateY(-10px)}}
+.spark2{transform-box:fill-box;animation:spark2 .7s ease-out infinite}
+@keyframes walkA{0%,100%{transform:translateX(0)}50%{transform:translateX(60px)}}
+.walkA{animation:walkA 18s ease-in-out infinite}
 @keyframes wag{from{transform:rotate(-16deg)}to{transform:rotate(16deg)}}
 .wag{transform-box:fill-box;transform-origin:0% 100%;animation:wag .3s ease-in-out infinite alternate}
 @keyframes bobup{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -224,7 +230,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const seasonNow=()=>{const m=new Date().getMonth()+1;return m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter";};
 
 /* ========== 저장 ========== */
-const APP_VER="2026-09-28 · 7";
+const APP_VER="2026-09-28 · 8";
 const KEY="quest-state-v1";
 const blank=()=>({
   v:2, who:null, pin:{child:"",parent:""}, season:thisMonth(), score:0, stars:0,
@@ -588,8 +594,24 @@ function girlScene(){
     <path d="M-10 300 Q120 268 240 292 Q330 310 410 288 L410 710 L-10 710Z" fill="${sc.ground}" ${OL}/>
     <path d="M296 452 q40 -18 70 -6 q22 10 6 24 q-30 20 -76 6 q-16 -10 0 -24Z" fill="#8fd3ff" ${OL}/>
     ${bush(40,330,.8,sc.leaf)}
-    <g transform="translate(120 360)">${houseSVG(f.house)}</g>
+    <g transform="translate(120 360)">${houseSVG(f.house)}${choreLeft()?`<g transform="translate(0 -110)">${star(0,0,0,1.3)}<text y="26" text-anchor="middle" font-family="Jua, sans-serif" font-size="13" fill="${P}">집안일!</text></g>`:""}</g>
     <g transform="translate(320 400)" class="hot" data-act="tree" tabindex="0" role="button" aria-label="이달의 나무"><rect x="-60" y="-140" width="120" height="150" fill="#000" fill-opacity="0"/>${treeSVG(S.tree.stage,ready)}</g>
+    <g class="walkA" style="animation-duration:17s"><g transform="translate(60 452) scale(.9)">
+      <ellipse cx="0" cy="2" rx="17" ry="4" fill="${P}" opacity=".15"/>
+      <ellipse cx="0" cy="-12" rx="17" ry="11" fill="#fff" ${OL} stroke-width="2.4"/>
+      <ellipse cx="-6" cy="-14" rx="6" ry="4" fill="#4a4550"/><ellipse cx="7" cy="-9" rx="5" ry="3.5" fill="#4a4550"/>
+      <rect x="-12" y="-6" width="5" height="8" rx="2" fill="#fff" ${OL} stroke-width="2"/><rect x="7" y="-6" width="5" height="8" rx="2" fill="#fff" ${OL} stroke-width="2"/>
+      <g transform="translate(17 -20)"><ellipse rx="9" ry="8" fill="#fff" ${OL} stroke-width="2.4"/><ellipse cx="3" cy="3" rx="5" ry="4" fill="#ffc2c2"/>
+        <circle cx="-3" cy="-2" r="1.5" fill="${P}"/><circle cx="4" cy="-2" r="1.5" fill="${P}"/>
+        <path d="M-6 -8 L-9 -13 L-3 -11Z M6 -8 L9 -13 L3 -11Z" fill="#fff" ${OL} stroke-width="2"/></g>
+      <path d="M-17 -16 q-6 -4 -4 -10" fill="none" ${OL} stroke-width="2.4"/></g></g>
+    <g class="walkA" style="animation-duration:23s;animation-delay:-6s"><g transform="translate(250 470) scale(.85)">
+      <ellipse cx="0" cy="2" rx="15" ry="4" fill="${P}" opacity=".15"/>
+      <g>${[[0,-14,11],[-9,-10,8],[9,-10,8],[0,-21,8]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${P}" stroke="${P}" stroke-width="6"/>`).join("")}${[[0,-14,11],[-9,-10,8],[9,-10,8],[0,-21,8]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fffaf2"/>`).join("")}</g>
+      <rect x="-9" y="-6" width="4.5" height="8" rx="2" fill="#5a4a66" ${OL} stroke-width="2"/><rect x="5" y="-6" width="4.5" height="8" rx="2" fill="#5a4a66" ${OL} stroke-width="2"/>
+      <g transform="translate(13 -18)"><ellipse rx="7" ry="6.5" fill="#5a4a66" ${OL} stroke-width="2.2"/>
+        <circle cx="-2.5" cy="-1" r="1.4" fill="#fff"/><circle cx="3" cy="-1" r="1.4" fill="#fff"/>
+        <ellipse cx="-7" cy="-2" rx="3" ry="4.5" fill="#5a4a66" ${OL} stroke-width="2"/></g></g></g>
     ${f.plots.slice(0,plotCount()).map((p,i)=>plotSVG(p,i,78+(i%3)*84,510+Math.floor(i/3)*72)).join("")}
     <g transform="translate(300 650)"><ellipse cx="0" cy="0" rx="34" ry="7" fill="${P}" opacity=".18"/><g class="hot" data-act="me" tabindex="0" role="button" aria-label="내 캐릭터">${girlChar()}</g></g>
     <g transform="translate(210 660) scale(.85)"><ellipse cx="0" cy="0" rx="20" ry="5" fill="${P}" opacity=".18"/><g class="hot" data-act="pet" tabindex="0" role="button" aria-label="밤이"><rect x="-26" y="-58" width="52" height="62" fill="#000" fill-opacity="0"/>${petBam()}</g></g>
@@ -609,12 +631,27 @@ function boyScene(){
       <rect x="-110" y="-150" width="220" height="180" fill="#000" fill-opacity="0"/>
       <path d="M-56 8 Q-56 -92 0 -92 Q56 -92 56 8Z" fill="#3a3364" ${OL}/><path d="M-38 8 Q-38 -66 0 -66 Q38 -66 38 8Z" fill="#191634" ${OL}/>
       <circle cx="-14" cy="-30" r="4" fill="#ff7e78"/><circle cx="12" cy="-30" r="4" fill="#ff7e78"/></g>
-    <g transform="translate(205 390)">${castleSVG(S.castle.level)}</g>
+    <g transform="translate(205 390)">${castleSVG(S.castle.level)}${choreLeft()?`<g transform="translate(0 -120)">${star(0,0,0,1.3)}<text y="26" text-anchor="middle" font-family="Jua, sans-serif" font-size="13" fill="#fff">순찰!</text></g>`:""}</g>
     <g class="hot" data-act="forge" tabindex="0" role="button" aria-label="대장간" transform="translate(70 520)">
       <rect x="-70" y="-110" width="140" height="120" fill="#000" fill-opacity="0"/>
       <rect x="-58" y="-62" width="116" height="62" rx="6" fill="#6b5b45" ${OL}/><path d="M-66 -62 L0 -104 L66 -62Z" fill="#8a5a34" ${OL}/>
       <rect x="-30" y="-44" width="60" height="30" rx="5" fill="#2b2338" ${OL}/>
-      <g transform="translate(0 -18)"><path class="flick" d="M0 0 C-14 -2 -16 -20 -5 -34 C-3 -25 2 -27 3 -40 C13 -28 17 -13 12 -4 C9 0 4 1 0 0Z" fill="#ff8a3d" stroke="${P}" stroke-width="2.4"/></g></g>
+      <g transform="translate(-6 -18)"><path class="flick" d="M0 0 C-14 -2 -16 -20 -5 -34 C-3 -25 2 -27 3 -40 C13 -28 17 -13 12 -4 C9 0 4 1 0 0Z" fill="#ff8a3d" stroke="${P}" stroke-width="2.4"/></g>
+      <g transform="translate(48 4)">
+        <path d="M-13 0 L-11 -11 L13 -11 L11 0Z" fill="#6b5b45" ${OL} stroke-width="2.4"/>
+        <rect x="-10" y="-16" width="21" height="6" rx="2.5" fill="#9aa3bd" ${OL} stroke-width="2.4"/>
+        <path d="M-6 -17 L9 -21" stroke="#dfe6f5" stroke-width="3.4" stroke-linecap="round"/>
+        <g class="spark2"><circle cx="2" cy="-22" r="1.9" fill="#ffd84d"/><circle cx="9" cy="-25" r="1.5" fill="#ff8a3d"/><circle cx="-4" cy="-26" r="1.5" fill="#fff1a6"/></g>
+      </g>
+      <g transform="translate(80 4)">
+        <ellipse cx="0" cy="-13" rx="11" ry="13" fill="#8a5a34" ${OL} stroke-width="2.4"/>
+        <rect x="-8" y="-3" width="6" height="5" rx="2" fill="#5a4a3a" ${OL} stroke-width="2"/><rect x="3" y="-3" width="6" height="5" rx="2" fill="#5a4a3a" ${OL} stroke-width="2"/>
+        <circle cx="-1" cy="-32" r="10" fill="#ffe8d8" ${OL} stroke-width="2.4"/>
+        <path d="M-11 -34 C-12 -45 9 -45 8 -34 C4 -38 -7 -38 -11 -34Z" fill="#4a3a2e" ${OL} stroke-width="2.2"/>
+        <circle cx="-5" cy="-31" r="1.6" fill="${P}"/><circle cx="2" cy="-31" r="1.6" fill="${P}"/>
+        <path d="M-6 -26 Q-2 -23 2 -26" fill="none" stroke="${P}" stroke-width="1.8" stroke-linecap="round"/>
+        <g class="hammer"><rect x="-26" y="-20" width="22" height="4.5" rx="2" fill="#8a5a34" ${OL} stroke-width="2"/><rect x="-36" y="-26" width="12" height="15" rx="2" fill="#9aa3bd" ${OL} stroke-width="2.2"/></g>
+      </g></g>
     ${bossOn?`<g class="hot" data-act="boss" tabindex="0" role="button" aria-label="보스 도전" transform="translate(205 235)"><g class="bob">
       <rect x="-56" y="-70" width="112" height="86" fill="#000" fill-opacity="0"/>
       <path d="M-40 10 Q-52 -30 -30 -46 Q-16 -58 0 -58 Q16 -58 30 -46 Q52 -30 40 10Z" fill="#4b2f6b" ${OL}/>
@@ -903,7 +940,7 @@ function renderStatus(body,tab){
   const tabs=`<div class="tabs">${[["log","기록"],["look","꾸미기"]].map(([k,n])=>`<button class="tab${k===tab?" on":""}" data-t="${k}">${n}</button>`).join("")}</div>`;
   if(tab==="look"){
     const lk=S.look, hairs=S.who==="boy"?BOY_HAIR:GIRL_HAIR;
-    const head=(i)=>`<svg viewBox="-56 -150 112 90">${(S.who==="boy"?boyChar(0,0,{...lk,hair:i}):girlChar({...lk,hair:i}))}</svg>`;
+    const head=(i)=>`<svg viewBox="-64 -172 128 116">${(S.who==="boy"?boyChar(0,0,{...lk,hair:i}):girlChar({...lk,hair:i}))}</svg>`;
     body.innerHTML=tabs+`
       <p class="sub">머리 모양</p><div class="three">${hairs.map((h,i)=>`<button class="card pickrw${lk.hair===i?" hi":""}" data-h="${i}" style="padding:4px;text-align:center">${head(i)}<div class="meta">${h.n}</div></button>`).join("")}</div>
       <p class="sub" style="margin-top:14px">머리 색</p><div class="hrow">${HAIRC.map((c,i)=>`<button class="sw${lk.color===i?" on":""}" data-c="${i}" style="background:${c.c}" aria-label="${c.n}"></button>`).join("")}</div>
@@ -1475,8 +1512,8 @@ function gateCard(html){$("#gate").innerHTML=`<div class="gatecard">${html}</div
 function hideGate(){$("#gate").style.display="none";}
 function chooseCharacter(){
   gateCard(`<h1>한 달 모험</h1><p class="sub">누구의 휴대폰인가요?</p>
-    <div class="picks"><button class="pick" data-w="girl"><svg viewBox="-60 -150 120 160">${girlChar()}</svg>여자 캐릭터<br><span style="font-size:13px;opacity:.7">농장·나무 키우기</span></button>
-    <button class="pick" data-w="boy"><svg viewBox="-60 -150 120 160">${boyChar(3,3)}</svg>남자 캐릭터<br><span style="font-size:13px;opacity:.7">강화·보스 사냥</span></button></div>`);
+    <div class="picks"><button class="pick" data-w="girl"><svg viewBox="-66 -176 132 180">${girlChar()}</svg>여자 캐릭터<br><span style="font-size:13px;opacity:.7">농장·나무 키우기</span></button>
+    <button class="pick" data-w="boy"><svg viewBox="-66 -176 132 180">${boyChar(3,3)}</svg>남자 캐릭터<br><span style="font-size:13px;opacity:.7">강화·보스 사냥</span></button></div>`);
   $("#gate").querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{S.who=b.dataset.w;S.pay=JSON.parse(JSON.stringify(PAY_PRESET[S.who]));save();setupPins();});
 }
 function setupPins(){
@@ -1528,8 +1565,8 @@ function childJoinScreen(){
     gateCard(`<h1>가족 코드 넣기</h1><p class="sub">부모님 휴대폰에 나온 코드를 적어주세요</p>
       <label class="field"><span>가족 코드</span><input data-f="code" maxlength="9" placeholder="ABCD-1234" style="text-transform:uppercase"></label>
       <p class="sub">누구의 휴대폰인가요?</p>
-      <div class="picks"><button class="pick" data-w="girl"><svg viewBox="-60 -150 120 160">${girlChar()}</svg>여자</button>
-        <button class="pick" data-w="boy"><svg viewBox="-60 -150 120 160">${boyChar(3,3)}</svg>남자</button></div>
+      <div class="picks"><button class="pick" data-w="girl"><svg viewBox="-66 -176 132 180">${girlChar()}</svg>여자</button>
+        <button class="pick" data-w="boy"><svg viewBox="-66 -176 132 180">${boyChar(3,3)}</svg>남자</button></div>
       <div class="row"><button class="btn alt" data-back>뒤로</button></div>`);
     const pre=$("#gate").querySelector('[data-f="code"]'); if(LINK.code) pre.value=LINK.code;
     let picked="";
