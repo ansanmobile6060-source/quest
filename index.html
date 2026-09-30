@@ -97,6 +97,9 @@ button{font-family:inherit}
   justify-content:center;gap:2px;color:var(--plum);font-size:12px;padding:4px;box-shadow:inset 0 -5px 0 rgba(61,51,80,.14)}
 .slot svg{width:50%}.slot b{font-weight:400;font-size:13px}.slot.off{opacity:.4}
 .plot{background:#e8c79a}
+.promisebox{font-family:'Gowun Dodum',sans-serif;font-size:16px;line-height:1.7;background:#fff3d6;border:2px solid var(--plum);
+  border-radius:12px;padding:10px 12px;margin-top:6px;word-break:keep-all}
+.promisebox b{font-family:'Jua',sans-serif;font-size:13px;color:#c9564f}
 .help{font-family:'Gowun Dodum',sans-serif;font-size:14px;line-height:1.7;background:#fff1c9;border:2px dashed var(--plum);border-radius:14px;padding:10px 12px;word-break:keep-all}
 .big{font-size:22px;text-align:center;margin:6px 0}
 .pill{display:inline-block;border:2.5px solid var(--plum);border-radius:999px;padding:3px 12px;font-size:14px;background:#fff}
@@ -230,7 +233,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const seasonNow=()=>{const m=new Date().getMonth()+1;return m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter";};
 
 /* ========== 저장 ========== */
-const APP_VER="2026-09-30 · 9";
+const APP_VER="2026-09-30 · 11";
 const KEY="quest-state-v1";
 const blank=()=>({
   v:2, who:null, pin:{child:"",parent:""}, season:thisMonth(), score:0, stars:0,
@@ -415,10 +418,11 @@ const blobHair=(H,cs)=>cs.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" f
 const FRONT={
   straight:`M-40 -98 C-44 -170 44 -170 40 -98 C34 -110 26 -117 20 -108 C14 -119 4 -121 0 -111 C-4 -121 -16 -120 -21 -109 C-27 -117 -34 -110 -40 -98Z`,
   side:`M-40 -98 C-44 -170 44 -170 40 -98 C32 -112 8 -120 -6 -108 C-14 -118 -32 -113 -40 -98Z`,
-  neat:`M-41 -98 C-45 -172 45 -172 41 -98 C31 -112 19 -117 9 -108 C1 -119 -18 -119 -26 -107 C-32 -113 -37 -107 -41 -98Z`,
-  spike:`M-41 -98 L-34 -138 L-25 -112 L-15 -152 L-4 -114 L8 -154 L18 -114 L28 -140 L41 -98 C20 -112 -20 -112 -41 -98Z`,
-  bowl:`M-43 -98 C-47 -172 47 -172 43 -98 C22 -112 -22 -112 -43 -98Z`,
-  boylong:`M-41 -98 C-45 -172 45 -172 41 -98 C33 -114 14 -122 -2 -108 C-12 -120 -33 -114 -41 -98Z`
+  neat:`M-41 -96 C-45 -172 45 -172 41 -96 C38 -114 18 -126 -4 -117 C-18 -111 -31 -103 -41 -96Z`,
+  spike:`M-41 -98 L-33 -142 L-23 -116 L-13 -156 L-2 -118 L10 -156 L20 -118 L30 -144 L41 -98 C22 -122 -22 -122 -41 -98Z`,
+  bowl:`M-43 -100 C-47 -172 47 -172 43 -100 C26 -110 -26 -110 -43 -100Z`,
+  curlybase:`M-41 -98 C-45 -164 45 -164 41 -98 C24 -116 -24 -116 -41 -98Z`,
+  boylong:`M-41 -96 C-45 -172 45 -172 41 -96 C35 -118 14 -130 0 -110 C-14 -130 -35 -118 -41 -96Z`
 };
 function girlHairBack(lk){
   const H=hairOf(lk), id=(GIRL_HAIR[lk.hair]||GIRL_HAIR[0]).id;
@@ -441,12 +445,13 @@ function boyHair(lk){
   const H=hairOf(lk), id=(BOY_HAIR[lk.hair]||BOY_HAIR[0]).id;
   const back=hairBack(H,(id==="spike"||id==="curly")?"lowshort":"short");
   if(id==="spike") return back+"|FRONT|"+`<path d="${FRONT.spike}" fill="${H}" ${OL}/>`;
-  if(id==="curly") return back+"|FRONT|"+blobHair(H,[[-28,-128,14],[-10,-146,15],[10,-146,15],[28,-126,14],[0,-140,16]])
-    +`<path d="M-41 -101 C-20 -113 20 -113 41 -101 C20 -107 -20 -107 -41 -101Z" fill="${H}" ${OL} stroke-width="2.4"/>`;
+  if(id==="curly") return back+"|FRONT|"
+    +`<path d="${FRONT.curlybase}" fill="${H}" ${OL}/>`
+    +blobHair(H,[[-30,-136,14],[-11,-152,15],[11,-152,15],[30,-134,14],[0,-146,15]]);
   if(id==="bowl") return back+"|FRONT|"+`<path d="${FRONT.bowl}" fill="${H}" ${OL}/>`;
   if(id==="long") return hairBack(H,"bob")
-    +`<path d="M-43 -106 C-50 -84 -48 -66 -42 -60 C-40 -76 -39 -92 -38 -104Z" fill="${H}" ${OL} stroke-width="2.6"/>`
-    +`<path d="M43 -106 C50 -84 48 -66 42 -60 C40 -76 39 -92 38 -104Z" fill="${H}" ${OL} stroke-width="2.6"/>`
+    +`<path d="M-40 -112 C-49 -92 -48 -70 -43 -62 C-40 -78 -38 -96 -36 -110Z" fill="${H}" ${OL} stroke-width="2.6"/>`
+    +`<path d="M40 -112 C49 -92 48 -70 43 -62 C40 -78 38 -96 36 -110Z" fill="${H}" ${OL} stroke-width="2.6"/>`
     +"|FRONT|"+`<path d="${FRONT.boylong}" fill="${H}" ${OL}/>`;
   return back+"|FRONT|"+`<path d="${FRONT.neat}" fill="${H}" ${OL}/>`;
 }
@@ -779,7 +784,7 @@ function renderMissions(body,type){
         <span style="display:flex;gap:6px">${!m.photo&&!isDone&&!isPend?`<button class="btn sm alt" data-ph="${m.id}">사진</button>`:""}
         <button class="btn sm pink" data-m="${m.id}" ${isDone||isPend?"disabled":""}>완료했어요</button></span></div></div>`;
     }).join("")
-    +`<div class="row"><button class="btn alt sm" data-req>부모님께 도움 요청하기</button></div>`;
+    +`<div class="row"><button class="btn alt sm" data-req>잘한 일 · 약속 보내기</button></div>`;
   body.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{
     const m=S.missions.find(x=>x.id===b.dataset.m),opts=rwsOf(m);
     if(opts.length>1) return chooseReward(body,m,type);
@@ -825,19 +830,29 @@ function chooseReward(body,m,type,forcePhoto){
 }
 function reqLeft(){ if(S.req.date!==today()){S.req={date:today(),n:0};save();} return REQ_LIMIT-S.req.n; }
 function renderRequest(body,back){
-  setRibbon("도움 요청");
+  setRibbon("부모님께 보내기");
   const items=REQ_ITEMS[S.who==="boy"?"boy":"girl"];
-  body.innerHTML=`<p class="sub">필요한 게 있으면 부모님께 요청해요 (오늘 ${reqLeft()}번 남음)</p>
-    <p class="help">"왜 필요한지"를 적으면 승인받기 쉬워요. 예) 보스 도전에 기력이 부족해요 / 나무에 줄 물이 없어요</p>
-    <label class="field" style="margin-top:10px"><span>필요한 것</span><select data-f="it">${items.map((it,i)=>`<option value="${i}">${MAT[it.k].name} ${it.q}개</option>`).join("")}</select></label>
-    <label class="field"><span>한마디</span><textarea data-f="msg" maxlength="60" placeholder="왜 필요한지 적어주세요"></textarea></label>
-    <div class="row"><button class="btn alt" data-back>뒤로</button><button class="btn pink" data-send ${reqLeft()>0?"":"disabled"}>요청 보내기</button></div>`;
-  body.querySelector("[data-back]").onclick=back;
-  body.querySelector("[data-send]").onclick=()=>{
-    const it=items[+body.querySelector('[data-f="it"]').value],msg=body.querySelector('[data-f="msg"]').value.trim();
-    S.pending.push({id:uid2(),kind:"req",title:`${MAT[it.k].name} ${it.q}개 요청`,rw:{[it.k]:it.q},msg,pt:0,at:today()});
-    S.req.n++;save();drawMenu();toast("요청을 보냈어요!");back();
+  let mode="done";
+  const draw=()=>{
+    body.innerHTML=`<p class="sub">오늘 ${reqLeft()}번 더 보낼 수 있어요</p>
+      <div class="tabs"><button class="tab${mode==="done"?" on":""}" data-k="done">잘한 일 자랑</button><button class="tab${mode==="promise"?" on":""}" data-k="promise">약속하기</button></div>
+      <p class="help">${mode==="done"
+        ? "미션에는 없지만 스스로 잘한 일을 적어 보내요. 부모님이 보고 인정해 주시면 재료를 받아요.<br>예) 동생 숙제를 도와줬어요 / 설거지를 했어요"
+        : "앞으로 지킬 약속을 적어 보내요. 부모님이 믿고 먼저 재료를 주실 수 있어요.<br>예) 오늘부터 매일 9시에 잘게요 / 게임은 1시간만 할게요"}</p>
+      <label class="field" style="margin-top:10px"><span>${mode==="done"?"내가 잘한 일":"지킬 약속"}</span><textarea data-f="msg" maxlength="120" placeholder="${mode==="done"?"어떤 일을 했는지 적어주세요":"어떤 약속인지 적어주세요"}"></textarea></label>
+      <label class="field"><span>받고 싶은 것</span><select data-f="it">${items.map((it,i)=>`<option value="${i}">${MAT[it.k].name} ${it.q}개</option>`).join("")}</select></label>
+      <div class="row"><button class="btn alt" data-back>뒤로</button><button class="btn pink" data-send ${reqLeft()>0?"":"disabled"}>보내기</button></div>`;
+    body.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{mode=b.dataset.k;draw();});
+    body.querySelector("[data-back]").onclick=back;
+    body.querySelector("[data-send]").onclick=()=>{
+      const msg=body.querySelector('[data-f="msg"]').value.trim();
+      if(msg.length<4) return toast(mode==="done"?"어떤 일을 했는지 적어주세요":"어떤 약속인지 적어주세요");
+      const it=items[+body.querySelector('[data-f="it"]').value];
+      S.pending.push({id:uid2(),kind:"req",mode,title:`${mode==="done"?"잘한 일":"약속"} · ${MAT[it.k].name} ${it.q}개`,rw:{[it.k]:it.q},msg,pt:0,at:today()});
+      S.req.n++;save();drawMenu();toast("부모님께 보냈어요!");back();
+    };
   };
+  draw(); body.scrollTop=0;
 }
 
 /* ========== 가방 · 상점 · 도감 ========== */
@@ -1050,7 +1065,7 @@ function renderTree(body){
     <div class="card hi" style="margin-top:14px"><h3>마지막 주 도전 · 열매 맺기</h3>
       <div class="tagline"><span class="tag${ready?" done":" lock"}">나무 ${treeMax()}단계 필요${S.diff.auto&&clears()?` (도전 성공 ${clears()}번으로 +${clears()})`:""}</span><span class="tag${last?" done":" lock"}">매달 마지막 주</span></div>
       <div class="meta" style="margin-top:6px">${t.done?"성공했어요! 이달의 추가 용돈을 받아요":ready?(last?"지금 도전할 수 있어요!":"마지막 주가 되면 도전할 수 있어요"):"나무를 더 키워야 해요. 물이나 영양제가 부족하면 부모님께 요청해보세요"}</div>
-      <div class="row" style="margin-top:8px">${t.done?"":`<button class="btn pink" data-try ${ready&&last?"":"disabled"}>열매 맺기 도전</button><button class="btn alt sm" data-req>도움 요청</button>`}</div></div>`;
+      <div class="row" style="margin-top:8px">${t.done?"":`<button class="btn pink" data-try ${ready&&last?"":"disabled"}>열매 맺기 도전</button><button class="btn alt sm" data-req>잘한 일 · 약속 보내기</button>`}</div></div>`;
   const w=body.querySelector("[data-w]"),n=body.querySelector("[data-n]");
   if(w) w.onclick=()=>{S.inv.water--;t.stage=Math.min(treeMax(),t.stage+1+((S.farm.deco.includes("rug")&&Math.random()<0.2)?1:0));refresh();renderTree(body);toast("쑥쑥!");};
   if(n) n.onclick=()=>{S.inv.nutri--;t.stage=Math.min(treeMax(),t.stage+2);refresh();renderTree(body);toast("쑥쑥쑥!");};
@@ -1110,7 +1125,7 @@ function renderHunt(body){
     ${MONSTERS.map(m=>{const rate=Math.max(10,Math.min(95,55+(power-m.power)*12));
       return `<div class="card"><h3>${m.name}</h3><div class="tagline"><span class="tag">필요 전투력 ${m.power}</span><span class="tag">성공 ${rate}%</span>${rwTags(m.rw)}</div>
         <div class="foot"><span class="meta">${power>=m.power?"도전할 수 있어요":"조금 더 강해져야 해요"}</span><button class="btn sm pink" data-h="${m.id}" ${left>0?"":"disabled"}>사냥</button></div></div>`;}).join("")}
-    <div class="row"><button class="btn alt sm" data-req>기력이 부족해요 (도움 요청)</button></div>`;
+    <div class="row"><button class="btn alt sm" data-req>잘한 일 · 약속 보내고 기력 받기</button></div>`;
   body.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{
     if(huntLeft()<=0) return toast("오늘 사냥은 끝! 미션으로 기력을 모아보세요");
     useHunt();
@@ -1128,7 +1143,7 @@ function renderBoss(body){
     <div class="card hi"><div class="tagline"><span class="tag${ok?" done":" lock"}">필요 전투력 ${bossNeed()}${S.diff.auto&&clears()?` (+${2*clears()})`:""}</span><span class="tag">내 전투력 ${power}</span><span class="tag${last?" done":" lock"}">매달 마지막 주</span></div>
       <div class="tagline">${rwTags(BOSS.rw)}<span class="tag">★ 10</span></div>
       <div class="meta" style="margin-top:6px">${S.hero.boss?"이번 달 보스를 물리쳤어요! 추가 용돈을 받아요":ok?(last?"지금 도전할 수 있어요!":"마지막 주에 문이 열려요"):"전투력이 부족하면 이길 수 없어요. 미션으로 재료를 모으거나 부모님께 기력을 요청해보세요"}</div>
-      <div class="row" style="margin-top:8px">${S.hero.boss?"":`<button class="btn pink" data-try ${last&&huntLeft()>0?"":"disabled"}>도전하기</button><button class="btn alt sm" data-req>도움 요청</button>`}</div></div>
+      <div class="row" style="margin-top:8px">${S.hero.boss?"":`<button class="btn pink" data-try ${last&&huntLeft()>0?"":"disabled"}>도전하기</button><button class="btn alt sm" data-req>잘한 일 · 약속 보내기</button>`}</div></div>
     <p class="help">보스를 이기면 이달의 도전 성공이에요. 기본 용돈 외에 추가 용돈을 받아요.</p>`;
   const tr=body.querySelector("[data-try]");
   if(tr) tr.onclick=()=>{
@@ -1175,16 +1190,22 @@ function bindBack(body){const b=body.querySelector("[data-back]");if(b)b.onclick
 function renderApprove(body){
   setRibbon("승인");
   body.innerHTML=`${backBtn}${S.pending.length?"":`<p class="sub" style="margin-top:12px">승인할 요청이 없어요</p>`}
-    ${S.pending.map(p=>`<div class="card${p.kind==="req"?" hi":""}" style="margin-top:10px"><h3>${esc(p.title)}${p.kind==="req"?" (도움 요청)":""}</h3>
-      ${p.msg?`<div class="meta">"${esc(p.msg)}"</div>`:""}
+    ${S.pending.map(p=>`<div class="card${p.kind==="req"?" hi":""}" style="margin-top:10px"><h3>${esc(p.title)}${p.kind==="req"?(p.mode==="promise"?" (약속)":" (잘한 일)"):""}</h3>
+      ${p.msg?`<div class="${p.kind==="req"?"promisebox":"meta"}">${p.kind==="req"?`<b>${p.mode==="promise"?"약속":"잘한 일"}</b><br>`:""}${esc(p.msg)}</div>`:""}
       ${p.photo?`<button data-pic="${p.id}" style="border:0;background:none;padding:0;margin-top:6px;width:100%;cursor:pointer"><img src="${p.photo}" alt="인증 사진" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;border:2.5px solid var(--plum)"></button>`:""}
       <div class="tagline">${p.pt?`<span class="tag">${p.pt}점</span>`:""}${rwTags(p.rw)}<span class="tag">${p.at.slice(5).replace("-",". ")}</span></div>
+      ${p.kind==="req"?`<label class="field" style="margin-top:8px"><span>줄 재료 (바꿀 수 있어요)</span><select data-rw="${p.id}">${REQ_ITEMS[S.who==="boy"?"boy":"girl"].map((it,i)=>`<option value="${i}"${p.rw[it.k]===it.q?" selected":""}>${MAT[it.k].name} ${it.q}개</option>`).join("")}<option value="none">주지 않기 (인정만)</option></select></label>`:""}
       <label class="field" style="margin-top:8px"><span>칭찬 한마디 (선택)</span><input data-msg="${p.id}" maxlength="40" placeholder="예: 오늘 정말 멋졌어!"></label>
       <div class="row" style="margin-top:0"><button class="btn sm alt" data-no="${p.id}">아직이에요</button><button class="btn sm pink" data-yes="${p.id}">승인</button></div></div>`).join("")}`;
   bindBack(body);
   body.querySelectorAll("[data-pic]").forEach(b=>b.onclick=()=>{const p=S.pending.find(x=>x.id===b.dataset.pic);if(p&&p.photo)openPhoto(p.photo);});
   body.querySelectorAll("[data-yes]").forEach(b=>b.onclick=()=>{
     const i=S.pending.findIndex(x=>x.id===b.dataset.yes),p=S.pending[i],msg=(body.querySelector(`[data-msg="${p.id}"]`)||{}).value||"";
+    const sel=(body.querySelector(`[data-rw="${p.id}"]`)||{}).value;
+    if(p.kind==="req"&&sel!==undefined){
+      if(sel==="none") p.rw={};
+      else { const it=REQ_ITEMS[S.who==="boy"?"boy":"girl"][+sel]; p.rw={[it.k]:it.q}; }
+    }
     S.pending.splice(i,1);gain(p.rw);
     if(p.kind!=="req"){
       const x2=S.event===today(),pt=p.pt*(x2?2:1);
@@ -1193,7 +1214,7 @@ function renderApprove(body){
       if(Math.random()<BOX_RATE){S.box++;toast("보물상자를 하나 찾았어요!");}
       updateStreak();
       S.log.unshift({at:today(),t:`${p.title} 승인 (+${pt}점)`});
-    } else S.log.unshift({at:today(),t:`${p.title} 지급`});
+    } else S.log.unshift({at:today(),t:`${p.mode==="promise"?"약속":"잘한 일"} 인정 · ${esc(p.msg||"").slice(0,18)}`});
     S.log=S.log.slice(0,60);
     if(msg.trim()) S.praise={msg:msg.trim(),at:today(),seen:false};
     refresh();renderApprove(body);toast("승인했어요!");
