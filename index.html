@@ -233,7 +233,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const seasonNow=()=>{const m=new Date().getMonth()+1;return m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter";};
 
 /* ========== 저장 ========== */
-const APP_VER="2026-09-30 · 11";
+const APP_VER="2026-09-30 · 16";
 const KEY="quest-state-v1";
 const blank=()=>({
   v:2, who:null, pin:{child:"",parent:""}, season:thisMonth(), score:0, stars:0,
@@ -408,52 +408,61 @@ function kidFace(lk){
 const skinOf=lk=>(SKINS[(lk||S.look).skin]||SKINS[0]).c;
 const hairOf=lk=>(HAIRC[(lk||S.look).color]||HAIRC[1]).c;
 const HAIR_BACK={
-  lowshort:`M-41 -96 C-45 -150 45 -150 41 -96 C40 -84 38 -76 36 -68 C34 -80 33 -90 33 -96 L-33 -96 C-33 -90 -34 -80 -36 -68 C-38 -76 -40 -84 -41 -96Z`,
-  short:`M-43 -96 C-47 -172 47 -172 43 -96 C42 -84 40 -76 38 -68 C36 -80 35 -90 35 -96 L-35 -96 C-35 -90 -36 -80 -38 -68 C-40 -76 -42 -84 -43 -96Z`,
-  bob:`M-44 -96 C-48 -172 48 -172 44 -96 C45 -78 42 -62 38 -54 C36 -68 35 -84 35 -96 L-35 -96 C-35 -84 -36 -68 -38 -54 C-42 -62 -45 -78 -44 -96Z`,
-  long:`M-44 -96 C-48 -172 48 -172 44 -96 C48 -66 44 -34 33 -26 C26 -23 23 -36 27 -52 L-27 -52 C-23 -36 -26 -23 -33 -26 C-44 -34 -48 -66 -44 -96Z`
+  short:`M-46 -92 C-50 -178 50 -178 46 -92 C45 -78 42 -70 40 -60 C37 -74 36 -84 35 -92 L-35 -92 C-36 -84 -37 -74 -40 -60 C-42 -70 -45 -78 -46 -92Z`,
+  lowshort:`M-45 -92 C-49 -156 49 -156 45 -92 C44 -78 41 -70 39 -60 C36 -74 35 -84 34 -92 L-34 -92 C-35 -84 -36 -74 -39 -60 C-41 -70 -44 -78 -45 -92Z`,
+  midlong:`M-46 -92 C-50 -178 50 -178 46 -92 C48 -68 44 -48 38 -42 C35 -60 34 -76 34 -92 L-34 -92 C-34 -76 -35 -60 -38 -42 C-44 -48 -48 -68 -46 -92Z`,
+  bob:`M-47 -92 C-51 -178 51 -178 47 -92 C48 -70 45 -54 40 -46 C37 -62 36 -78 36 -92 L-36 -92 C-36 -78 -37 -62 -40 -46 C-45 -54 -48 -70 -47 -92Z`,
+  long:`M-47 -92 C-51 -178 51 -178 47 -92 C50 -60 46 -30 34 -22 C27 -19 24 -32 28 -48 L-28 -48 C-24 -32 -27 -19 -34 -22 C-46 -30 -50 -60 -47 -92Z`
 };
 const hairBack=(H,kind)=>`<path d="${HAIR_BACK[kind]}" fill="${H}" ${OL}/>`;
 const blobHair=(H,cs)=>cs.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${P}" stroke="${P}" stroke-width="6"/>`).join("")+cs.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${H}"/>`).join("");
+const mergeHair=(H,paths,circles)=>
+  paths.map(d=>`<path d="${d}" fill="${P}" stroke="${P}" stroke-width="6" stroke-linejoin="round"/>`).join("")
+  +circles.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${P}" stroke="${P}" stroke-width="6"/>`).join("")
+  +paths.map(d=>`<path d="${d}" fill="${H}"/>`).join("")
+  +circles.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${H}"/>`).join("");
+const shine=(d)=>`<path d="${d}" fill="none" stroke="#fff" stroke-width="3.4" opacity=".22" stroke-linecap="round"/>`;
 const FRONT={
-  straight:`M-40 -98 C-44 -170 44 -170 40 -98 C34 -110 26 -117 20 -108 C14 -119 4 -121 0 -111 C-4 -121 -16 -120 -21 -109 C-27 -117 -34 -110 -40 -98Z`,
-  side:`M-40 -98 C-44 -170 44 -170 40 -98 C32 -112 8 -120 -6 -108 C-14 -118 -32 -113 -40 -98Z`,
-  neat:`M-41 -96 C-45 -172 45 -172 41 -96 C38 -114 18 -126 -4 -117 C-18 -111 -31 -103 -41 -96Z`,
-  spike:`M-41 -98 L-33 -142 L-23 -116 L-13 -156 L-2 -118 L10 -156 L20 -118 L30 -144 L41 -98 C22 -122 -22 -122 -41 -98Z`,
-  bowl:`M-43 -100 C-47 -172 47 -172 43 -100 C26 -110 -26 -110 -43 -100Z`,
-  curlybase:`M-41 -98 C-45 -164 45 -164 41 -98 C24 -116 -24 -116 -41 -98Z`,
-  boylong:`M-41 -96 C-45 -172 45 -172 41 -96 C35 -118 14 -130 0 -110 C-14 -130 -35 -118 -41 -96Z`
+  /* 여자 */
+  gStraight:`M-45 -94 C-49 -178 49 -178 45 -94 C40 -112 32 -122 24 -113 C16 -124 6 -126 0 -114 C-6 -126 -16 -124 -24 -113 C-32 -122 -40 -112 -45 -94Z`,
+  gSide:`M-45 -94 C-49 -178 49 -178 45 -94 C40 -116 26 -130 6 -120 C-8 -113 -26 -108 -35 -100 C-39 -98 -42 -96 -45 -94Z`,
+  gWave:`M-45 -94 C-49 -178 49 -178 45 -94 C38 -114 28 -126 18 -116 C10 -108 -2 -110 -10 -118 C-20 -128 -34 -118 -45 -94Z`,
+  /* 남자 */
+  dandy:`M-46 -92 C-50 -178 50 -178 46 -92 C42 -114 34 -128 22 -124 C10 -120 0 -110 -12 -114 C-24 -118 -36 -108 -46 -92Z`,
+  spike:`M-46 -92 C-49 -126 -47 -146 -40 -154 L-35 -130 L-25 -160 L-14 -132 L-2 -170 L10 -132 L20 -160 L30 -132 L40 -154 C47 -146 49 -126 46 -92 C26 -122 -26 -122 -46 -92Z`,
+  curly:`M-46 -92 C-50 -172 50 -172 46 -92 C28 -118 -28 -118 -46 -92Z`,
+  seethru:`M-46 -92 C-50 -178 50 -178 46 -92 C40 -108 33 -118 25 -109 C17 -118 9 -108 1 -117 C-7 -108 -16 -118 -25 -109 C-34 -118 -40 -106 -46 -92Z`,
+  center:`M-46 -92 C-50 -178 50 -178 46 -92 C39 -120 16 -134 0 -112 C-16 -134 -39 -120 -46 -92Z`
 };
 function girlHairBack(lk){
   const H=hairOf(lk), id=(GIRL_HAIR[lk.hair]||GIRL_HAIR[0]).id;
   if(id==="twin") return hairBack(H,"bob")
-    +`<g transform="translate(-50 -92)"><circle r="13" fill="${H}" ${OL}/><circle cy="19" r="11" fill="${H}" ${OL}/><circle cy="36" r="9" fill="${H}" ${OL}/></g>`
-    +`<g transform="translate(50 -92)"><circle r="13" fill="${H}" ${OL}/><circle cy="19" r="11" fill="${H}" ${OL}/><circle cy="36" r="9" fill="${H}" ${OL}/></g>`;
+    +`<g transform="translate(-52 -88)"><circle r="14" fill="${H}" ${OL}/><circle cy="20" r="12" fill="${H}" ${OL}/><circle cy="38" r="9.5" fill="${H}" ${OL}/></g>`
+    +`<g transform="translate(52 -88)"><circle r="14" fill="${H}" ${OL}/><circle cy="20" r="12" fill="${H}" ${OL}/><circle cy="38" r="9.5" fill="${H}" ${OL}/></g>`;
   if(id==="pony") return hairBack(H,"bob")
-    +`<path d="M42 -108 C68 -96 70 -62 54 -42 C47 -34 36 -37 41 -50 C50 -70 52 -94 36 -106Z" fill="${H}" ${OL}/>`;
+    +`<path d="M44 -112 C72 -100 74 -60 56 -38 C48 -29 36 -33 42 -47 C52 -70 54 -96 38 -110Z" fill="${H}" ${OL}/>`;
   if(id==="bob") return hairBack(H,"bob");
   if(id==="wave") return hairBack(H,"long")
-    +blobHair(H,[[-30,-28,9],[-10,-24,9],[10,-24,9],[30,-28,9]]);
+    +blobHair(H,[[-30,-24,10],[-10,-20,10],[10,-20,10],[30,-24,10]]);
   return hairBack(H,"long");
 }
 function girlHairFront(lk){
   const H=hairOf(lk), id=(GIRL_HAIR[lk.hair]||GIRL_HAIR[0]).id;
-  const d=(id==="pony"||id==="twin")?FRONT.side:FRONT.straight;
-  return `<path d="${d}" fill="${H}" ${OL}/>`;
+  const d=id==="pony"||id==="twin"?FRONT.gSide:id==="wave"?FRONT.gWave:FRONT.gStraight;
+  return `<path d="${d}" fill="${H}" ${OL}/>${shine("M-24 -152 C-8 -162 12 -160 26 -148")}`;
 }
 function boyHair(lk){
   const H=hairOf(lk), id=(BOY_HAIR[lk.hair]||BOY_HAIR[0]).id;
-  const back=hairBack(H,(id==="spike"||id==="curly")?"lowshort":"short");
-  if(id==="spike") return back+"|FRONT|"+`<path d="${FRONT.spike}" fill="${H}" ${OL}/>`;
-  if(id==="curly") return back+"|FRONT|"
-    +`<path d="${FRONT.curlybase}" fill="${H}" ${OL}/>`
-    +blobHair(H,[[-30,-136,14],[-11,-152,15],[11,-152,15],[30,-134,14],[0,-146,15]]);
-  if(id==="bowl") return back+"|FRONT|"+`<path d="${FRONT.bowl}" fill="${H}" ${OL}/>`;
-  if(id==="long") return hairBack(H,"bob")
-    +`<path d="M-40 -112 C-49 -92 -48 -70 -43 -62 C-40 -78 -38 -96 -36 -110Z" fill="${H}" ${OL} stroke-width="2.6"/>`
-    +`<path d="M40 -112 C49 -92 48 -70 43 -62 C40 -78 38 -96 36 -110Z" fill="${H}" ${OL} stroke-width="2.6"/>`
-    +"|FRONT|"+`<path d="${FRONT.boylong}" fill="${H}" ${OL}/>`;
-  return back+"|FRONT|"+`<path d="${FRONT.neat}" fill="${H}" ${OL}/>`;
+  const sh=shine("M-22 -152 C-6 -162 12 -160 26 -146");
+  if(id==="spike") return hairBack(H,"short")+"|FRONT|"+`<path d="${FRONT.spike}" fill="${H}" ${OL}/>`;
+  if(id==="curly") return hairBack(H,"short")+"|FRONT|"
+    +mergeHair(H,[FRONT.curly],[[-31,-140,15],[-12,-153,16],[12,-153,16],[31,-138,15],[0,-148,16]])+sh;
+  if(id==="bowl") return hairBack(H,"short")+"|FRONT|"+`<path d="${FRONT.seethru}" fill="${H}" ${OL}/>${sh}`;
+  if(id==="long") return hairBack(H,"midlong")
+    +`<path d="M-42 -116 C-52 -94 -50 -66 -44 -56 C-41 -76 -39 -98 -37 -114Z" fill="${H}" ${OL} stroke-width="2.6"/>`
+    +`<path d="M42 -116 C52 -94 50 -66 44 -56 C41 -76 39 -98 37 -114Z" fill="${H}" ${OL} stroke-width="2.6"/>`
+    +"|FRONT|"+`<path d="${FRONT.center}" fill="${H}" ${OL}/>${sh}`;
+  return hairBack(H,"short")+"|FRONT|"+`<path d="${FRONT.dandy}" fill="${H}" ${OL}/>${sh}`;
 }
 function girlChar(lk){ lk=Object.assign({hair:0,color:1,skin:0,eye:0},lk||S.look); const SK=skinOf(lk);
   return `<g class="idle">
