@@ -233,7 +233,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const seasonNow=()=>{const m=new Date().getMonth()+1;return m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter";};
 
 /* ========== 저장 ========== */
-const APP_VER="2026-09-30 · 16";
+const APP_VER="2026-10-05 · 18";
 const KEY="quest-state-v1";
 const blank=()=>({
   v:2, who:null, pin:{child:"",parent:""}, season:thisMonth(), score:0, stars:0,
@@ -1183,6 +1183,7 @@ function renderParent(body){
   setRibbon("부모 메뉴");
   body.innerHTML=`<div class="card"><h3>승인 기다리는 요청 ${S.pending.length}개</h3><div class="foot"><span class="meta">미션 완료와 도움 요청</span><button class="btn sm pink" data-g="approve">확인하기</button></div></div>
     <div class="card"><h3>미션 관리</h3><div class="foot"><span class="meta">등록 ${S.missions.length}개</span><button class="btn sm" data-g="missions">열기</button></div></div>
+    <div class="card"><h3>선물 주기</h3><div class="foot"><span class="meta">미션과 상관없이 재료·점수 주기</span><button class="btn sm pink" data-g="gift">열기</button></div></div>
     <div class="card"><h3>소원 상점 쿠폰</h3><div class="foot"><span class="meta">${S.shop.length}종</span><button class="btn sm" data-g="shop">열기</button></div></div>
     <div class="card"><h3>용돈·등급</h3><div class="foot"><span class="meta">기본 ${won(S.pay.base)} · 도전 ${won(S.pay.challenge)}</span><button class="btn sm" data-g="pay">열기</button></div></div>
     <div class="card"><h3>월말 리포트·정산</h3><div class="foot"><span class="meta">이번 달 ${S.score}점 · ${won(pay().total)}</span><button class="btn sm" data-g="report">열기</button></div></div>
@@ -1191,6 +1192,7 @@ function renderParent(body){
     <div class="card"><h3>비밀번호·캐릭터</h3><div class="foot"><span class="meta">${S.who==="boy"?"남자 캐릭터":"여자 캐릭터"}</span><button class="btn sm" data-g="setting">열기</button></div></div>`;
   body.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
     if(b.dataset.g==="event"){ S.event=S.event===today()?"":today(); refresh(); renderParent(body); return toast(S.event?"오늘 승인은 점수 2배!":"이벤트를 껐어요"); }
+    if(b.dataset.g==="gift"){ setRibbon("선물 주기"); body.innerHTML=`<button class="btn alt sm" data-back>‹ 부모 메뉴</button>`; const wrap=el(`<div></div>`); body.appendChild(wrap); renderGift(wrap,S.who); bindBack(body); return; }
     ({approve:renderApprove,missions:renderMissionAdmin,shop:renderShopAdmin,pay:renderPay,report:renderReport,backup:renderBackup,setting:renderSetting}[b.dataset.g])(body);
   });
 }
@@ -1508,7 +1510,9 @@ function kidCard(w){
     <div class="row" style="margin-top:8px"><button class="btn sm pink" data-k="${w}" data-v="approve">승인 ${wait?`(${wait})`:""}</button>
       <button class="btn sm alt" data-k="${w}" data-v="missions">미션</button>
       <button class="btn sm alt" data-k="${w}" data-v="pay">용돈</button>
-      <button class="btn sm alt" data-k="${w}" data-v="report">리포트</button></div></div>`;
+      <button class="btn sm alt" data-k="${w}" data-v="report">리포트</button>
+      <button class="btn sm alt" data-k="${w}" data-v="scene">아이 화면 보기</button>
+      <button class="btn sm" data-k="${w}" data-v="gift">선물 주기</button></div></div>`;
   S=cur; parWho=keep; return html;
 }
 function renderParentHome(){
@@ -1533,9 +1537,68 @@ function renderParentHome(){
 }
 function openKid(w,view){
   if(!PAR[w]) return toast("아직 아이 휴대폰이 연결되지 않았어요");
+  if(view==="scene") return openKidScene(w);
+  if(view==="gift") return openGift(w);
   parWho=w; S=Object.assign(blank(),PAR[w]);
   const fn={approve:renderApprove,missions:renderMissionAdmin,pay:renderPay,report:renderReport}[view];
   openSheet(w==="boy"?"아들":"딸","#9f7ff0",body=>fn(body));
+}
+function giftTargets(who){ return Object.keys(MAT).filter(k=>MAT[k].who===(who==="boy"?"boy":"girl")); }
+function openGift(w){
+  parWho=w; S=Object.assign(blank(),PAR[w]);
+  openSheet(w==="boy"?"아들에게 선물":"딸에게 선물","#ff9fbf",body=>renderGift(body,w));
+}
+function renderGift(body,w){
+  const keys=giftTargets(S.who);
+  body.innerHTML=`<p class="sub">미션과 상관없이 바로 줄 수 있어요</p>
+    <div class="two"><label class="field"><span>재료</span><select data-f="mat"><option value="none">주지 않기</option>${keys.map(k=>`<option value="${k}">${MAT[k].name}</option>`).join("")}</select></label>
+      <label class="field"><span>개수</span><input data-f="qty" type="number" min="0" max="99999" value="1"></label></div>
+    <label class="field"><span>점수 (0이면 점수는 안 올라가요)</span><input data-f="pt" type="number" min="0" max="50" value="0"></label>
+    <label class="field"><span>한마디</span><input data-f="msg" maxlength="40" placeholder="예: 시험 잘 봤어! 정말 멋졌어"></label>
+    <p class="help">점수를 주면 등급과 이번 달 용돈에도 반영돼요. 재료만 주면 용돈에는 영향이 없어요.</p>
+    <div class="row"><button class="btn pink" data-send>보내기</button></div>`;
+  body.querySelector("[data-send]").onclick=async()=>{
+    const mat=body.querySelector('[data-f="mat"]').value;
+    const qty=Math.max(0,+body.querySelector('[data-f="qty"]').value||0);
+    const pt=Math.max(0,+body.querySelector('[data-f="pt"]').value||0);
+    const msg=body.querySelector('[data-f="msg"]').value.trim();
+    const rw=(mat!=="none"&&qty)?{[mat]:qty}:{};
+    if(!Object.keys(rw).length&&!pt) return toast("재료나 점수 중 하나는 넣어주세요");
+    const label=[Object.keys(rw).length?`${MAT[mat].name} ${amt(mat,qty)}개`:"",pt?`${pt}점`:""].filter(Boolean).join(" · ");
+    if(!await ask(`${label}을(를) 선물로 보낼까요?`,"보내기","취소"))return;
+    gain(rw); if(pt){S.score+=pt;S.stars+=pt;}
+    S.praise={msg:msg||`선물이 도착했어요! (${label})`,at:today(),seen:false};
+    S.log.unshift({at:today(),t:`선물 · ${label}`}); S.log=S.log.slice(0,60);
+    save();
+    if(LINK.mode==="parent"){ closeSheet(); renderParentHome(); } else { refresh(); closeSheet(); }
+    toast("선물을 보냈어요!");
+  };
+}
+let kidSceneT;
+function kidSceneHTML(w){
+  const cur=S, curWho=parWho;
+  S=Object.assign(blank(),PAR[w]);
+  const svg=(S.who==="boy"?boyScene():girlScene());
+  const g=grade(),p=pay(),left=todayLeft();
+  const info=`<div class="tagline" style="justify-content:center"><span class="tag">${g.name} ${S.score}점</span><span class="tag">${won(p.total)}</span>
+    <span class="tag">${S.who==="boy"?`전투력 ${S.hero.weapon+S.hero.armor}`:`나무 ${S.tree.stage}/${treeMax()}`}</span><span class="tag">남은 할일 ${left}개</span></div>`;
+  const inv=Object.keys(MAT).filter(k=>MAT[k].who===(S.who==="boy"?"boy":"girl")).map(k=>`<span class="tag">${matIcon(k)}${MAT[k].name} ${amt(k,S.inv[k]||0)}</span>`).join("");
+  S=cur; parWho=curWho;
+  return {svg,info,inv};
+}
+function openKidScene(w){
+  openSheet(w==="boy"?"아들 화면":"딸 화면","#9f7ff0",body=>{
+    const draw=()=>{
+      const d=kidSceneHTML(w);
+      body.innerHTML=`${d.info}
+        <div style="border:3px solid var(--plum);border-radius:18px;overflow:hidden;margin-top:8px;background:#cdeaff">
+          <svg viewBox="0 120 400 580" style="display:block;width:100%" aria-label="아이 화면">${d.svg}</svg></div>
+        <p class="sub" style="margin-top:10px">아이 가방</p><div class="tagline" style="justify-content:center">${d.inv}</div>
+        <p class="help" style="margin-top:10px">아이 휴대폰에 보이는 화면이에요. 여기서는 보기만 할 수 있고, 10초마다 새로 불러와요.</p>`;
+    };
+    draw();
+    clearInterval(kidSceneT); kidSceneT=setInterval(()=>{ if(sheet.classList.contains("open")) draw(); else clearInterval(kidSceneT); },10000);
+  });
 }
 
 /* ========== 시작 ========== */
